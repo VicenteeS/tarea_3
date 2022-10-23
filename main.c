@@ -21,20 +21,18 @@ typedef struct{
 }Videojuego;
 
 
-
 int main(void) {
-  int opcion, auxOpcionI;
+  int opcion, auxOpcionI, j, cont;
   
   Videojuego *v;
 
-  //void *punteroV, *punteroP;
-
-  char *i, *auxOpcionS;
+  char *i, linea[30], *auxOpcionS;
   
   HashMap* mapaJuegos = createMap(100);
-  List *listP, *listAUXp, *listV, *listAUXv, *auxListas;
+  HashMap* mapaFechas = createMap(100);
+  List *listP, *listAUXp, *listV, *listAUXv, *auxListas, *listaFec, *lAuxF;
   PairTree *auxValoracion, *auxPrecio, *auxArbol;
-  Pair *aux;
+  Pair *aux, *auxFec;
   
   
   TreeMap* mapPrecio = createTreeMap(lower_than_string);
@@ -47,7 +45,7 @@ int main(void) {
     do{
       /*Menú que muestra en pantalla las opciones que podemos 
       realizar*/
-      mostrarMenu();
+     mostrarMenu();
   
       fflush(stdin);
       scanf("%i",&opcion);
@@ -59,6 +57,7 @@ int main(void) {
     {
       case 2://agregar
         v = (Videojuego*) malloc(sizeof(Videojuego));
+
         
         printf("Ingrese nombre del videojuego: ");
         fgets(v->nombre,30,stdin);
@@ -75,13 +74,38 @@ int main(void) {
         printf("Ingrese precio del videojuego: ");
         fgets(v->precio, 30,stdin);
         strcpy(v->precio, quitarSalto(v->precio));
-        
+
+
         
         aux  = searchMap(mapaJuegos, v->nombre);
         if(aux == NULL)
         {
           insertMap(mapaJuegos, v->nombre, v);
-                    
+          
+          cont = 0;
+          //fecha dd/mm/aaaa
+          for(j = 6; j<=9; j++)
+          {
+            strcpy(&linea[cont], &v->fecha[j]);
+            cont++;
+          }
+          if(searchMap(mapaFechas, linea) == NULL)
+          {
+            listaFec = createList();
+            pushFront(listaFec, v->nombre);
+
+            insertMap(mapaFechas, linea, listaFec);
+          }
+          else
+          {
+            auxFec = searchMap(mapaFechas, linea);
+            lAuxF = auxFec->value;
+
+            pushFront(lAuxF, v->nombre);
+
+            auxFec->value = lAuxF;
+          }
+          //Ingresar por Precio
           if(searchTreeMap(mapPrecio, v->precio) == NULL)
           {
            
@@ -99,6 +123,8 @@ int main(void) {
             
             auxPrecio->value = listAUXp;
           }
+          
+          
           
           if(searchTreeMap(mapValoracion, v->valoracion) == NULL)
           {
@@ -123,6 +149,10 @@ int main(void) {
           auxPrecio = NULL;
           listV = NULL;
           listP = NULL;
+          auxFec = NULL;
+          lAuxF = NULL;
+          listaFec = NULL;
+          v = NULL;
         } 
       break;
       case 3:
@@ -137,7 +167,6 @@ int main(void) {
         for(auxArbol = firstTreeMap(mapPrecio); auxArbol != NULL; auxArbol = nextTreeMap(mapPrecio))
         {
           listAUXp = auxArbol->value;
-          
           if(auxOpcionI == 0)
           {
             for(i = firstList(listAUXp); i != NULL; i = nextList(listAUXp))
@@ -194,9 +223,10 @@ int main(void) {
         printf("Ingrese la valoración mínima: \n");
           
         fflush(stdin);
-       fgets(auxOpcionS,30,stdin);
+        fgets(auxOpcionS,30,stdin);
         strcpy(auxOpcionS, quitarSalto(auxOpcionS));
         printf("\n");
+
 
         
         for(auxArbol = upperBound(mapValoracion, auxOpcionS); auxArbol != NULL; auxArbol = nextTreeMap(mapValoracion))
@@ -216,6 +246,23 @@ int main(void) {
         }
         listAUXv = NULL;
         auxArbol = NULL;
+      break;
+      case 5:
+        printf("Ingrese un año: \n");
+        fflush(stdin);
+        fgets(linea,30,stdin);
+        strcpy(linea, quitarSalto(linea));
+
+        printf("Los juegos del año %s son:\n", (char *)linea);
+        aux = searchMap(mapaFechas, linea);
+        if(aux != NULL)
+        {
+          for(i = firstList(aux->value); i != NULL; i = nextList(aux->value))
+          {
+            printf("%s\n", (char *)i);
+          }
+        }
+        printf("Juegos de este año mostrados\n");
       break;
     }
   }
@@ -240,6 +287,7 @@ char* quitarSalto(char* linea)
   }
   return(linea);
 }
+
 void mostrarMenu()
 {
   printf("\n Introduzca una opción (1-9)");
@@ -255,4 +303,3 @@ void mostrarMenu()
 
   return;
 }
-
