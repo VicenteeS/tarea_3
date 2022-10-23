@@ -1,24 +1,44 @@
-# tarea_3
-Esta tarea fue realizada por José Basualto, Luciano Cubillos y Vicente Montiel para el curso Estructura de Datos.
-
+# TAREA 3
+### Esta tarea fue realizada por José Basualto, Luciano Cubillos y Vicente Montiel para el curso Estructura de Datos.
+---
 ## Ejecución de la Tarea
 
-Al ingresar al repositorio en Github, haga click en el botón verde que dice "[Code]", y descargue como [.zip]. 
+Al ingresar al repositorio en Github, haga click en el botón verde "[Code]()",  y descargue como [zip](). 
 
-Al descargárlo, extraigalo, y abra Visual Studio Code o su entorno de desarrollo favorito.
 
-En la consola para compilar el código escriba:
+Al descargarlo, extráigalo, y luego abra Visual Studio Code o su entorno de desarrollo favorito junto con la carpeta de la tarea.
 
-```bash
+- Abra una nueva terminal y en la consola para compilar el código escriba:
+
+```
 gcc -g main.c list.c hashmap.c treemap.c -o tarea_3
 ```
-Y luego para ejecutarla, escriba:
+- Y luego para ejecutarla:
 
-```bash
-./tarea_2
 ```
-## Observaciones
+./tarea_3
+```
+---
+## Observaciones de la Tarea 3
+- no
 
-### Nombre Integrante 1:
-### Nombre Integrante 2:
-### Nombre Integrante 3:
+---
+## COEVALUACION:
+
+### José Basualto Gonzalez: 
+ola
+
+### Luciano Cubillos Bugueño:
+ola
+### Vicente Montiel Torres:
+ola
+
+--- 
+## Puntos a Favor o en Contra
+
+| Nombre | Puntos  
+| --- | :---: 
+| *José Basualto Gonzalez* | +0  
+| *Luciano Cubillos Bugueño* | +0 
+| *Vicente Montiel Torres* | +0 
+---
