@@ -26,12 +26,12 @@ gcc -g main.c list.c hashmap.c treemap.c -o tarea_3
 ## COEVALUACION:
 
 ### José Basualto Gonzalez: 
-ola
+- Al igual que la tarea anterior pocas veces coincidimos los 3 para trabajar juntos, pero a pesar de eso logramos sacar la tarea adelante y tratar de trabajar por separado cuando se dieron los tiempos para asi lograr la entrega.
 
 ### Luciano Cubillos Bugueño:
-ola
+- No pudimos juntarnos de manera online para avanzar la tarea pero nos juntamos un par de veces en el laboratorio para avanzar con la tarea los tres juntos o de a dos en algunos momentos.
 ### Vicente Montiel Torres:
-ola
+- Como grupo, siento que nos esforzamos bastante, lo que más nos costó fue el tiempo para poder reunirnos, pero en general trabajamos de manera grata y todos pusimos la disposición para la tarea. Al no coincidir para juntarnos de manera online, la mayor parte del tiempo avanzamos en nuestros ratos libres de la universidad. 
 
 --- 
 ## Puntos a Favor o en Contra
