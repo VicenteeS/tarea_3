@@ -12,6 +12,8 @@
 int lower_than_string(void* , void*);
 char* quitarSalto(char* linea);
 void mostrarMenu();
+void mostrarDetalles(HashMap *, char *linea);
+
 
 typedef struct{
   char nombre[30];
@@ -22,23 +24,29 @@ typedef struct{
 
 
 int main(void) {
-  int opcion, auxOpcionI, j, cont;
   
-  Videojuego *v;
+  int opcion, auxOpcionI, j, cont;
 
   char *i, linea[30], *auxOpcionS;
   
+  Videojuego *v;
+  
   HashMap* mapaJuegos = createMap(100);
   HashMap* mapaFechas = createMap(100);
-  List *listP, *listAUXp, *listV, *listAUXv, *auxListas, *listaFec, *lAuxF;
-  PairTree *auxValoracion, *auxPrecio, *auxArbol;
-  Pair *aux, *auxFec;
-  
   
   TreeMap* mapPrecio = createTreeMap(lower_than_string);
   TreeMap* mapValoracion = createTreeMap(lower_than_string);
-
+  
+  
+  TreeMap *listaFec, *lAuxF;
+  List *listP, *listAUXp, *listV, *listAUXv, *auxListas;
+  PairTree *auxValoracion, *auxPrecio, *auxArbol;
+  Pair *aux, *auxFec;
+  
   auxListas = NULL;
+  
+  
+
   
   while(opcion!=0)
   {
@@ -81,7 +89,8 @@ int main(void) {
         if(aux == NULL)
         {
           insertMap(mapaJuegos, v->nombre, v);
-          
+
+          //Ingresar por Fecha (año)
           cont = 0;
           //fecha dd/mm/aaaa
           for(j = 6; j<=9; j++)
@@ -91,8 +100,8 @@ int main(void) {
           }
           if(searchMap(mapaFechas, linea) == NULL)
           {
-            listaFec = createList();
-            pushFront(listaFec, v->nombre);
+            listaFec = createTreeMap(lower_than_string);
+            insertTreeMap(listaFec, v->valoracion, v->nombre);
 
             insertMap(mapaFechas, linea, listaFec);
           }
@@ -100,11 +109,13 @@ int main(void) {
           {
             auxFec = searchMap(mapaFechas, linea);
             lAuxF = auxFec->value;
-
-            pushFront(lAuxF, v->nombre);
+            
+            insertTreeMap(lAuxF, v->valoracion, v->nombre);
 
             auxFec->value = lAuxF;
           }
+
+          
           //Ingresar por Precio
           if(searchTreeMap(mapPrecio, v->precio) == NULL)
           {
@@ -303,6 +314,41 @@ int main(void) {
         auxFec = NULL;
         
       break;
+      case 6:
+        printf("Ingrese el nombre del juego que desee: \n");
+
+        fflush(stdin);
+        fgets(linea,30,stdin);
+        strcpy(linea, quitarSalto(linea));
+        printf("\n");
+
+        printf("Los detalles del juego son los siguientes: \n");
+        mostrarDetalles(mapaJuegos, linea);
+
+        printf("Modificar un dato del videojuego, ingrese 0: \n");
+        printf("Eliminar el videojuego, ingrese 1: \n");
+
+        fflush(stdin);
+        scanf("%i",&auxOpcionI);
+        getchar(); 
+        printf("\n");
+
+        if(auxOpcionI == 0)
+        {
+          
+        }
+        else
+        {
+          if(auxOpcionI == 1)
+          {
+            HashMap* mapaJuegos = createMap(100);
+  HashMap* mapaFechas = createMap(100);
+  
+  TreeMap* mapPrecio = createTreeMap(lower_than_string);
+  TreeMap* mapValoracion = createTreeMap(lower_than_string);
+          }
+        }
+      break;
     }
   }
 
@@ -340,5 +386,21 @@ void mostrarMenu()
   printf("\n 0.Salir");
   printf("\n");
 
+  return;
+}
+
+void mostrarDetalles(HashMap *mapaJuegos, char* linea)
+{
+  Pair *aux;
+  Videojuego *v;
+  
+  aux = searchMap(mapaJuegos, linea);
+  v = aux->value;
+  
+  printf("\nNombre: %s", v->nombre);
+  printf("\nFecha: %s", v->fecha);
+  printf("\nValoracion: %s", v->valoracion);
+  printf("\nPrecio: $%s", v->precio);
+  printf("\n");
   return;
 }
