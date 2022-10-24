@@ -252,17 +252,56 @@ int main(void) {
         fflush(stdin);
         fgets(linea,30,stdin);
         strcpy(linea, quitarSalto(linea));
+        printf("\n");
 
-        printf("Los juegos del año %s son:\n", (char *)linea);
+        printf("Los juegos mas valorados del año %s son:\n", (char *)linea);
         aux = searchMap(mapaFechas, linea);
+
         if(aux != NULL)
         {
-          for(i = firstList(aux->value); i != NULL; i = nextList(aux->value))
+          lAuxF = aux->value;
+          
+          for(auxArbol = firstTreeMap(lAuxF); auxArbol != NULL; auxArbol = nextTreeMap(lAuxF))
           {
-            printf("%s\n", (char *)i);
+            if(auxListas == NULL)
+            {
+              auxListas = createList();
+              pushFront(auxListas, (auxArbol));
+            }
+            else
+            {
+              pushFront(auxListas, auxArbol);
+            }
+             //printf("%s: %s\n", (char *)(auxArbol->value), (char *)(auxArbol->key));
           }
         }
-        printf("Juegos de este año mostrados\n");
+        auxArbol = firstList(auxListas);
+
+        auxFec = searchMap(mapaJuegos, auxArbol->value);
+        v = auxFec->value;
+        for(j = 0; j < 3 ; j++ )
+        {
+          if(v != NULL)
+          {
+            printf("%s: %s\n", (char *)(v->nombre), (char *)(v->valoracion));
+          }
+          
+          auxArbol = nextList(auxListas);
+          if(auxArbol == NULL)
+          {
+            break;
+          }
+          auxFec = searchMap(mapaJuegos, auxArbol->value);
+          v = auxFec->value;
+        }
+        
+        printf("\nJuegos de este año mostrados\n");
+
+        lAuxF = NULL;
+        auxArbol = NULL;
+        auxListas  = NULL;
+        auxFec = NULL;
+        
       break;
     }
   }
