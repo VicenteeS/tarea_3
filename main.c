@@ -27,7 +27,7 @@ int main(void) {
   
   int opcion, auxOpcionI, j, cont;
 
-  char *i, linea[30], *auxOpcionS;
+  char *i, linea[30], auxOpcionS[30];
   
   Videojuego *v;
   
@@ -90,7 +90,7 @@ int main(void) {
         {
           insertMap(mapaJuegos, v->nombre, v);
 
-          //Ingresar por Fecha (año)
+          //Ingresar por fecha (año)
           cont = 0;
           //fecha dd/mm/aaaa
           for(j = 6; j<=9; j++)
@@ -116,7 +116,7 @@ int main(void) {
           }
 
           
-          //Ingresar por Precio
+          //Ingresar por precio
           if(searchTreeMap(mapPrecio, v->precio) == NULL)
           {
            
@@ -136,7 +136,7 @@ int main(void) {
           }
           
           
-          
+          //Ingresar por valoración
           if(searchTreeMap(mapValoracion, v->valoracion) == NULL)
           {
             listV = createList();
@@ -153,7 +153,7 @@ int main(void) {
             
             auxValoracion->value = listAUXv;
           }
-          
+          //Reseteo para poder ingresar valores nuevo y que no se acumulen
           listAUXv = NULL;
           listAUXp = NULL;
           auxValoracion = NULL; 
@@ -174,7 +174,9 @@ int main(void) {
         scanf("%i",&auxOpcionI);
         getchar(); 
         printf("\n");
-        
+        /*Recorremos el árbol y si la opción ingresada es 0 lo mostramos de menor a mayor, en    
+          caso que la opción ingresada sea 1 creamos una lista nueva y con pushfront la    
+          ordenamos de mayor a menor y luego lo recorremos para mostrarlo*/
         for(auxArbol = firstTreeMap(mapPrecio); auxArbol != NULL; auxArbol = nextTreeMap(mapPrecio))
         {
           listAUXp = auxArbol->value;
@@ -226,6 +228,7 @@ int main(void) {
           }
         }
         printf("\n***Datos Mostrados***\n");
+        //Reseteo para poder ingresar valores nuevo y que no se acumulen
         auxArbol = NULL;
         auxListas = NULL;
         listAUXp = NULL;  
@@ -239,7 +242,8 @@ int main(void) {
         printf("\n");
 
 
-        
+        /*Utilizamos upperBound para buscar el dato y si no lo encontramos buscamos una clave 
+        mayor, recorremos la lista y buscamos en el mapa para luego mostrar por pantalla*/
         for(auxArbol = upperBound(mapValoracion, auxOpcionS); auxArbol != NULL; auxArbol = nextTreeMap(mapValoracion))
         {
           listAUXv = auxArbol->value;
@@ -255,6 +259,7 @@ int main(void) {
             }
           }
         }
+        //Reseteo para poder ingresar valores nuevo y que no se acumulen
         listAUXv = NULL;
         auxArbol = NULL;
       break;
@@ -264,14 +269,15 @@ int main(void) {
         fgets(linea,30,stdin);
         strcpy(linea, quitarSalto(linea));
         printf("\n");
-
+        
         printf("Los juegos mas valorados del año %s son:\n", (char *)linea);
+        /*se busca en el mapa fecha, mientras haya un dato se recorre el mapa y se inserta, 
+        luego se recorre 3 veces y muestra los 3 mejores rankeados por año*/
         aux = searchMap(mapaFechas, linea);
 
-        if(aux != NULL)
+        if(aux != NULL) 
         {
           lAuxF = aux->value;
-          
           for(auxArbol = firstTreeMap(lAuxF); auxArbol != NULL; auxArbol = nextTreeMap(lAuxF))
           {
             if(auxListas == NULL)
@@ -283,7 +289,6 @@ int main(void) {
             {
               pushFront(auxListas, auxArbol);
             }
-             //printf("%s: %s\n", (char *)(auxArbol->value), (char *)(auxArbol->key));
           }
         }
         auxArbol = firstList(auxListas);
@@ -307,7 +312,8 @@ int main(void) {
         }
         
         printf("\nJuegos de este año mostrados\n");
-
+        
+        //Reseteo para poder ingresar valores nuevo y que no se acumulen
         lAuxF = NULL;
         auxArbol = NULL;
         auxListas  = NULL;
@@ -324,7 +330,7 @@ int main(void) {
 
         printf("Los detalles del juego son los siguientes: \n");
         mostrarDetalles(mapaJuegos, linea);
-
+        /*
         printf("Modificar un dato del videojuego, ingrese 0: \n");
         printf("Eliminar el videojuego, ingrese 1: \n");
 
@@ -341,18 +347,18 @@ int main(void) {
         {
           if(auxOpcionI == 1)
           {
-            HashMap* mapaJuegos = createMap(100);
+            eraseMap(mapaJuegos,  linea);
+            eraseMap(mapaFechas, linea);
   HashMap* mapaFechas = createMap(100);
   
   TreeMap* mapPrecio = createTreeMap(lower_than_string);
   TreeMap* mapValoracion = createTreeMap(lower_than_string);
           }
-        }
+      
+        }*/
       break;
     }
   }
-
-  
   return 0;
 }
 
@@ -363,7 +369,7 @@ int lower_than_string(void* key1, void* key2)
     if(strcmp(k1,k2)<0) return 1;
     return 0;
 }
-
+//Funcion utilizada para quitar el salto de línea agregado en el fgets.
 char* quitarSalto(char* linea)
 {
   if ((strlen(linea) > 0) && (linea[strlen(linea) - 1] == '\n'))
@@ -372,7 +378,7 @@ char* quitarSalto(char* linea)
   }
   return(linea);
 }
-
+//Función del menú
 void mostrarMenu()
 {
   printf("\n Introduzca una opción (1-9)");
@@ -393,7 +399,7 @@ void mostrarDetalles(HashMap *mapaJuegos, char* linea)
 {
   Pair *aux;
   Videojuego *v;
-  
+
   aux = searchMap(mapaJuegos, linea);
   v = aux->value;
   
