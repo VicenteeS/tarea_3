@@ -1,3 +1,4 @@
+//Librerias estandar
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -9,13 +10,14 @@
 #include "list.h"
 #include "treemap.h"
 
+//Definicion de funciones que utilizaremos
 int lower_than_string(void* , void*);
 char* quitarSalto(char* linea);
 void mostrarMenu();
 void mostrarDetalles(HashMap *, char *linea);
 void *get_csv_field(char * tmp, int k);
 
-
+//Definicion de estructura Videojuego
 typedef struct{
   char nombre[50];
   char fecha[50];
@@ -25,7 +27,7 @@ typedef struct{
 
 
 int main(void) {
-  
+  /*Definimos algunas variables, mapas, listas que utilizaremos en el programa*/
   int opcion, auxOpcionI, j, cont, contVideojuegos = 0;
   void* auxi;
   char *i, linea[50], auxOpcionS[50], listaVideojuegos[50][100];
@@ -50,12 +52,12 @@ int main(void) {
 
   
 
-  
+  //Repetimos hasta que la opcion que seleccione el usuario sea 0
   while(opcion!=0)
   {
     do{
       /*Menú que muestra en pantalla las opciones que podemos 
-      realizar*/
+      ejecutar*/
      mostrarMenu();
   
       fflush(stdin);
@@ -66,14 +68,14 @@ int main(void) {
   
     switch(opcion)
     {
-      case 1:
-        
+      case 1: // Importar
+        // Se abre el archivo de mundos csv en modo lectura "r"
         file = fopen ("videojuegos.csv", "r");
         
         char line[1024];
         int l, contador;
         contador = 0;
-
+        // Cadena para guardar la linea completa del archivo csv
         fgets(line, 1023, file);
 
         
@@ -83,8 +85,12 @@ int main(void) {
           for(l=0 ; l<4 ; l++)
           {
             
-            auxi = get_csv_field(line, l);
-           
+            auxi = get_csv_field(line, l); 
+            /* Se obtiene cada string de la linea. */
+
+            /* Hay un contador para que, cuando se lean los 4 espacios 
+            del archivo, se agreguen a los mapas utilizados. */
+
             switch (l)
             {
               case 0: 
@@ -107,7 +113,8 @@ int main(void) {
            
             if(contador == 4)
             {
-              
+              /* Procede a agregarse a los distitos mapas utilizado
+              al igual que el caso 2 (ahí se ven en profundidad)*/
               contador = 0;
               
               v = (Videojuego*) malloc(sizeof(Videojuego));
@@ -122,15 +129,16 @@ int main(void) {
               
               if(aux == NULL)
               {
-                
+                // Se ingresa en una lista (array de videojuegos)
                 strcpy(listaVideojuegos[contVideojuegos], v->nombre);
                 contVideojuegos++;
                 
+                // Se inserta en el mapa Juegos
                 insertMap(mapaJuegos, v->nombre, v);
                 
               
             
-                //Ingresar por fecha (año)
+                // Ingresar en un mapa por fecha (año)
                 cont = 0;
                 for(j = 6; j<=9; j++)
                 {
@@ -153,7 +161,8 @@ int main(void) {
 
                   auxFec->value = lAuxF;
                 }
-          //Ingresar por precio
+
+                // Ingresar en un mapa por precio
                 if(searchTreeMap(mapPrecio, v->precio) == NULL)
                 {
            
@@ -172,7 +181,7 @@ int main(void) {
                   auxPrecio->value = listAUXp;
                 }
 
-              //Ingresar por valoración
+                // Ingresar en un mapa por valoracion 
                 if(searchTreeMap(mapValoracion, v->valoracion) == NULL)
                 {
                   listV = createList();
@@ -189,7 +198,7 @@ int main(void) {
             
                   auxValoracion->value = listAUXv;
                 }
-                //Reseteo para poder ingresar valores nuevo y que no se acumulen
+                // Reseteo de variables 
                 listAUXv = NULL;
                 listAUXp = NULL;
                 auxValoracion = NULL; 
@@ -205,12 +214,13 @@ int main(void) {
             }
           }
         }    
+        
         printf("~Archivo importado correctamente~\n");
       break;
-      case 2://agregar
+      case 2:// Agregar
+        //Ingresamos por la consola los datos solicitados, que pertenecen al tipo de dato Videojuego
         v = (Videojuego*) malloc(sizeof(Videojuego));
 
-        
         printf("Ingrese nombre del videojuego: ");
         fgets(v->nombre,30,stdin);
         strcpy(v->nombre, quitarSalto(v->nombre));
@@ -228,18 +238,25 @@ int main(void) {
         strcpy(v->precio, quitarSalto(v->precio));
 
 
+        /* Se busca el nombre del juego ingresado en el mapa Juegos.
+        Si no lo encuentra, se agrega en todos los mapas. 
+        En el caso contrario, no se agrega. */
         
         aux  = searchMap(mapaJuegos, v->nombre);
         if(aux == NULL)
         {
+          // Se ingresa en una lista (array de videojuegos)
           strcpy(listaVideojuegos[contVideojuegos] , v->nombre);
           contVideojuegos++;
-          
+
+          // Se inserta en el mapa Juegos
           insertMap(mapaJuegos, v->nombre, v);
 
-          //Ingresar por fecha (año)
-          cont = 0;
           //fecha dd/mm/aaaa
+          cont = 0;
+          /* Para ingresar las fechas en un mapa, se obtiene el año de cada fecha
+          y para luego insertarse en el mapa Fechas como key. Por otro lado, el value
+          en cada dato del mapa Fecha es otro mapa que ordena los datos por valoracion */
           for(j = 6; j<=9; j++)
           {
             strcpy(&linea[cont], &v->fecha[j]);
@@ -263,7 +280,15 @@ int main(void) {
           }
 
           
-          //Ingresar por precio
+          /*Se agregan los datos en el mapa ordenado Precio, en el cual 
+          las key son el precio de cada dato, y el value es una lista.
+          Esta lista si no existe (para ese precio) se crea; si ya
+          existe la lista, se agregan los datos al inicio */
+
+          /* Cada lista tanto en el mapa Precio como en el mapa 
+          Valoracion, guarda los datos con un mismo precio o misma
+          valoracion */
+
           if(searchTreeMap(mapPrecio, v->precio) == NULL)
           {
            
@@ -283,7 +308,10 @@ int main(void) {
           }
           
           
-          //Ingresar por valoración
+          /*Se ingresan los datos en el mapa Valoracion,
+          en la que cada key es la valoracion del juego,
+          y cada value es una lista */
+
           if(searchTreeMap(mapValoracion, v->valoracion) == NULL)
           {
             listV = createList();
@@ -300,7 +328,8 @@ int main(void) {
             
             auxValoracion->value = listAUXv;
           }
-          //Reseteo para poder ingresar valores nuevo y que no se acumulen
+          /* Se resetean a NULL todas las variables auxiliares utilizadas,
+          para que no se acumulen algunos valores */
           listAUXv = NULL;
           listAUXp = NULL;
           auxValoracion = NULL; 
@@ -313,7 +342,7 @@ int main(void) {
           v = NULL;
         } 
       break;
-      case 3:
+      case 3: //Mostrar por precio
         printf("Mostrar de MENOR A MAYOR, ingrese: 0\n");
         printf("Mostrar de MAYOR A MENOR, ingrese: 1\n");
           
@@ -321,7 +350,11 @@ int main(void) {
         scanf("%i",&auxOpcionI);
         getchar(); 
         printf("\n");
-        //Recorremos el árbol y si la opción ingresada es 0 lo mostramos de menor a mayor, en           caso que la opción ingresada sea 1 creamos una lista nueva y con pushfront la                 ordenamos de mayor a menor y luego lo recorremos para mostrarlo
+
+        /*Recorremos el árbol y si la opción ingresada es 0 lo mostramos de menor a mayor, en 
+        caso que la opción ingresada sea 1 creamos una lista nueva y con pushfront la    
+        ordenamos de mayor a menor y luego lo recorremos para mostrarlo */
+
         for(auxArbol = firstTreeMap(mapPrecio); auxArbol != NULL; auxArbol = nextTreeMap(mapPrecio))
         {
           listAUXp = auxArbol->value;
@@ -373,12 +406,13 @@ int main(void) {
           }
         }
         printf("\n***Datos Mostrados***\n");
+
         //Reseteo para poder ingresar valores nuevo y que no se acumulen
         auxArbol = NULL;
         auxListas = NULL;
         listAUXp = NULL;  
       break;
-      case 4:
+      case 4: //Mostrar por valoracion 
         printf("Ingrese la valoración mínima: \n");
           
         fflush(stdin);
@@ -387,7 +421,8 @@ int main(void) {
         printf("\n");
 
 
-        //Utilizamos upperBound para buscar el dato y si no lo encontramos buscamos una clave           mayor, recorremos la lista y buscamos en el mapa para luego mostrar por pantalla
+        /*Utilizamos upperBound para buscar el dato y si no lo encontramos buscamos una clave 
+        mayor, recorremos la lista y buscamos en el mapa para luego mostrar por pantalla*/
         for(auxArbol = upperBound(mapValoracion, auxOpcionS); auxArbol != NULL; auxArbol = nextTreeMap(mapValoracion))
         {
           listAUXv = auxArbol->value;
@@ -407,7 +442,7 @@ int main(void) {
         listAUXv = NULL;
         auxArbol = NULL;
       break;
-      case 5:
+      case 5: // Mostrar mejores juegos del año
         printf("Ingrese un año: \n");
         fflush(stdin);
         fgets(linea,30,stdin);
@@ -415,7 +450,11 @@ int main(void) {
         printf("\n");
         
         printf("Los juegos mas valorados del año %s son:\n", (char *)linea);
-// se busca en el mapa fecha, mientras haya un dato se recorre el mapa y se inserta, luego se recorre 3 veces y muestra los 3 mejores rankeados por año
+
+        /* Se busca en el mapa fecha, mientras haya un dato se recorre el mapa y se inserta
+        a una lista auxiliar para ordenarlo al reves, luego se recorre 3 veces desde el dato mayor
+        y muestra los 3 mejores rankeados por año*/ 
+
         aux = searchMap(mapaFechas, linea);
 
         if(aux != NULL) 
@@ -432,7 +471,6 @@ int main(void) {
             {
               pushFront(auxListas, auxArbol);
             }
-             //printf("%s: %s\n", (char *)(auxArbol->value), (char *)(auxArbol->key));
           }
         }
         auxArbol = firstList(auxListas);
@@ -465,6 +503,9 @@ int main(void) {
         
       break;
       case 6:
+      /* Busca el nombre del juego ingresado por el usuario y 
+      muestra sus detalles ocupando la funcion mostrarDetalles */
+
         printf("Ingrese el nombre del juego que desee: \n");
 
         fflush(stdin);
@@ -474,32 +515,6 @@ int main(void) {
 
         printf("Los detalles del juego son los siguientes: \n");
         mostrarDetalles(mapaJuegos, linea);
-        /*
-        printf("Modificar un dato del videojuego, ingrese 0: \n");
-        printf("Eliminar el videojuego, ingrese 1: \n");
-
-        fflush(stdin);
-        scanf("%i",&auxOpcionI);
-        getchar(); 
-        printf("\n");
-
-        if(auxOpcionI == 0)
-        {
-          
-        }
-        else
-        {
-          if(auxOpcionI == 1)
-          {
-            eraseMap(mapaJuegos,  linea);
-            eraseMap(mapaFechas, linea);
-  HashMap* mapaFechas = createMap(100);
-  
-  TreeMap* mapPrecio = createTreeMap(lower_than_string);
-  TreeMap* mapValoracion = createTreeMap(lower_than_string);
-          }
-      
-        }*/
       break;
       case 7:
         
@@ -543,6 +558,7 @@ void mostrarMenu()
 }
 
 void mostrarDetalles(HashMap *mapaJuegos, char* linea)
+/* Funcion que muestra cada dato al buscar un nombre en el mapa Juego*/
 {
   Pair *aux;
   Videojuego *v;
@@ -560,6 +576,7 @@ void mostrarDetalles(HashMap *mapaJuegos, char* linea)
 
 
 void * get_csv_field (char * tmp, int k) 
+/*Funcion que retorna un dato del archivo csv separado por comas*/
 {
   int open_mark = 0;
   char* ret=(char*) malloc (100*sizeof(char));
