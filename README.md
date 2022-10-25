@@ -20,8 +20,22 @@ gcc -g main.c list.c hashmap.c treemap.c -o tarea_3
 ```
 ---
 ## Observaciones de la Tarea 3
-- no
+- Al momento de ingresar una fecha, se ingresa con el formato dd/mm/aaaa.
+- Tenga en cuenta mayúsculas y minúsculas.
+- El programa soporta un total de 100 videojuegos.
+---
+## Opciones que no funcionan correctamente:
+- 3
+    - La funcion al compararse como string, se compara de izquierda a derecha, por lo que no importa que tan grande sea el numero, ya que si este empieza con un numero menor, el algoritmo dirá que es menor. (Por ej: 92>100)
+- 6
+    - La función solo muestra los detalles del juego ingresado, pero no se alcanzó a programar el resto de la función.
 
+## Opciones que sí funcionan correctamente:
+- 1
+- 2
+- 4
+- 5
+- 7
 ---
 ## COEVALUACION:
 

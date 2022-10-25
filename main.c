@@ -516,8 +516,32 @@ int main(void) {
         printf("Los detalles del juego son los siguientes: \n");
         mostrarDetalles(mapaJuegos, linea);
       break;
-      case 7:
+      case 7: // Exportar
+        remove("juegos.csv");
         
+        
+        // Abrimos el archivo ".csv"
+        file = fopen("juegos.csv", "w");
+        
+        if (!file) exit(EXIT_FAILURE);
+        //Se crea un ciclo que comienza al inicio de la lista y termina cuando no hay mas elementos
+        fprintf(file, "Nombre,año de salida,valoracion,precio\n");
+        for(j = 0 ; j < contVideojuegos; j++)
+        {
+          aux = searchMap(mapaJuegos, listaVideojuegos[j]);
+          v = aux->value;
+          if(aux != NULL)
+          {  //Imprimimos en el archivo cada dato separado por ","
+            fprintf(file, "%s,", v->nombre);
+            fprintf(file, "%s,", v->fecha);
+            fprintf(file, "%s,", v->valoracion);
+            fprintf(file, "%s\n", v->precio);
+          }
+        }
+        
+        //Se cierra el archivo y mostramos un mensaje de que funcionó correctamente
+        fclose(file);
+        printf("~Documento .csv exportado~\n");
       break;
     }
   }
