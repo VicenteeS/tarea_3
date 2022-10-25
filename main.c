@@ -13,23 +13,26 @@ int lower_than_string(void* , void*);
 char* quitarSalto(char* linea);
 void mostrarMenu();
 void mostrarDetalles(HashMap *, char *linea);
+void *get_csv_field(char * tmp, int k);
 
 
 typedef struct{
-  char nombre[30];
-  char fecha[30];
-  char valoracion[30];
-  char precio[30];
+  char nombre[50];
+  char fecha[50];
+  char valoracion[50];
+  char precio[50];
 }Videojuego;
 
 
 int main(void) {
   
-  int opcion, auxOpcionI, j, cont;
-
-  char *i, linea[30], auxOpcionS[30];
+  int opcion, auxOpcionI, j, cont, contVideojuegos = 0;
+  void* auxi;
+  char *i, linea[50], auxOpcionS[50], listaVideojuegos[50][100];
+  char nombre[50], fecha[50], valo[50], precio[50];
   
   Videojuego *v;
+  FILE *file;
   
   HashMap* mapaJuegos = createMap(100);
   HashMap* mapaFechas = createMap(100);
@@ -44,7 +47,7 @@ int main(void) {
   Pair *aux, *auxFec;
   
   auxListas = NULL;
-  
+
   
 
   
@@ -63,6 +66,147 @@ int main(void) {
   
     switch(opcion)
     {
+      case 1:
+        
+        file = fopen ("videojuegos.csv", "r");
+        
+        char line[1024];
+        int l, contador;
+        contador = 0;
+
+        fgets(line, 1023, file);
+
+        
+        while(fgets(line, 1023, file) != NULL)
+        { // Se lee la linea
+          
+          for(l=0 ; l<4 ; l++)
+          {
+            
+            auxi = get_csv_field(line, l);
+           
+            switch (l)
+            {
+              case 0: 
+                strcpy(nombre, auxi);
+                contador++;
+              break;
+              case 1: 
+                strcpy(fecha, auxi);
+                contador++;
+              break;
+              case 2:
+                strcpy(valo,auxi);
+                contador++;
+              break;
+              case 3:
+                strcpy(precio, auxi);
+                contador++;
+              break;
+            }
+           
+            if(contador == 4)
+            {
+              
+              contador = 0;
+              
+              v = (Videojuego*) malloc(sizeof(Videojuego));
+
+              strcpy(v->nombre, nombre);
+              strcpy(v->fecha, fecha);
+              strcpy(v->valoracion, valo);
+              strcpy(v->precio, precio);
+            
+          
+              aux  = searchMap(mapaJuegos, nombre);
+              
+              if(aux == NULL)
+              {
+                
+                strcpy(listaVideojuegos[contVideojuegos], v->nombre);
+                contVideojuegos++;
+                
+                insertMap(mapaJuegos, v->nombre, v);
+                
+              
+            
+                //Ingresar por fecha (año)
+                cont = 0;
+                for(j = 6; j<=9; j++)
+                {
+                  strcpy(&linea[cont], &v->fecha[j]);
+                  cont++;
+                }
+                if(searchMap(mapaFechas, linea) == NULL)
+                {
+                  listaFec = createTreeMap(lower_than_string);
+                  insertTreeMap(listaFec, v->valoracion, v->nombre);
+    
+                  insertMap(mapaFechas, linea, listaFec);
+                }
+                else
+                {
+                  auxFec = searchMap(mapaFechas, linea);
+                  lAuxF = auxFec->value;
+                
+                  insertTreeMap(lAuxF, v->valoracion, v->nombre);
+
+                  auxFec->value = lAuxF;
+                }
+          //Ingresar por precio
+                if(searchTreeMap(mapPrecio, v->precio) == NULL)
+                {
+           
+                  listP = createList();
+                  pushFront(listP, v->nombre);
+            
+                  insertTreeMap(mapPrecio, v->precio, listP);
+                }
+                else
+                {
+                  auxPrecio = searchTreeMap(mapPrecio, v->precio);
+            
+                  listAUXp = auxPrecio->value;
+                  pushFront(listAUXp, v->nombre);
+            
+                  auxPrecio->value = listAUXp;
+                }
+
+              //Ingresar por valoración
+                if(searchTreeMap(mapValoracion, v->valoracion) == NULL)
+                {
+                  listV = createList();
+                  pushFront(listV, v->nombre);
+                
+                  insertTreeMap(mapValoracion, v->valoracion, listV);
+                }
+                else
+                {
+                  auxValoracion = searchTreeMap(mapValoracion, v->valoracion);
+            
+                  listAUXv = auxValoracion->value;
+                  pushFront(listAUXv, v->nombre);
+            
+                  auxValoracion->value = listAUXv;
+                }
+                //Reseteo para poder ingresar valores nuevo y que no se acumulen
+                listAUXv = NULL;
+                listAUXp = NULL;
+                auxValoracion = NULL; 
+                auxPrecio = NULL;
+                listV = NULL;
+                listP = NULL;
+                auxFec = NULL;
+                lAuxF = NULL;
+                listaFec = NULL;
+                v = NULL;  
+
+              }
+            }
+          }
+        }    
+        printf("~Archivo importado correctamente~\n");
+      break;
       case 2://agregar
         v = (Videojuego*) malloc(sizeof(Videojuego));
 
@@ -88,6 +232,9 @@ int main(void) {
         aux  = searchMap(mapaJuegos, v->nombre);
         if(aux == NULL)
         {
+          strcpy(listaVideojuegos[contVideojuegos] , v->nombre);
+          contVideojuegos++;
+          
           insertMap(mapaJuegos, v->nombre, v);
 
           //Ingresar por fecha (año)
@@ -174,9 +321,7 @@ int main(void) {
         scanf("%i",&auxOpcionI);
         getchar(); 
         printf("\n");
-        /*Recorremos el árbol y si la opción ingresada es 0 lo mostramos de menor a mayor, en    
-          caso que la opción ingresada sea 1 creamos una lista nueva y con pushfront la    
-          ordenamos de mayor a menor y luego lo recorremos para mostrarlo*/
+        //Recorremos el árbol y si la opción ingresada es 0 lo mostramos de menor a mayor, en           caso que la opción ingresada sea 1 creamos una lista nueva y con pushfront la                 ordenamos de mayor a menor y luego lo recorremos para mostrarlo
         for(auxArbol = firstTreeMap(mapPrecio); auxArbol != NULL; auxArbol = nextTreeMap(mapPrecio))
         {
           listAUXp = auxArbol->value;
@@ -242,8 +387,7 @@ int main(void) {
         printf("\n");
 
 
-        /*Utilizamos upperBound para buscar el dato y si no lo encontramos buscamos una clave 
-        mayor, recorremos la lista y buscamos en el mapa para luego mostrar por pantalla*/
+        //Utilizamos upperBound para buscar el dato y si no lo encontramos buscamos una clave           mayor, recorremos la lista y buscamos en el mapa para luego mostrar por pantalla
         for(auxArbol = upperBound(mapValoracion, auxOpcionS); auxArbol != NULL; auxArbol = nextTreeMap(mapValoracion))
         {
           listAUXv = auxArbol->value;
@@ -271,8 +415,7 @@ int main(void) {
         printf("\n");
         
         printf("Los juegos mas valorados del año %s son:\n", (char *)linea);
-        /*se busca en el mapa fecha, mientras haya un dato se recorre el mapa y se inserta, 
-        luego se recorre 3 veces y muestra los 3 mejores rankeados por año*/
+// se busca en el mapa fecha, mientras haya un dato se recorre el mapa y se inserta, luego se recorre 3 veces y muestra los 3 mejores rankeados por año
         aux = searchMap(mapaFechas, linea);
 
         if(aux != NULL) 
@@ -289,6 +432,7 @@ int main(void) {
             {
               pushFront(auxListas, auxArbol);
             }
+             //printf("%s: %s\n", (char *)(auxArbol->value), (char *)(auxArbol->key));
           }
         }
         auxArbol = firstList(auxListas);
@@ -357,6 +501,9 @@ int main(void) {
       
         }*/
       break;
+      case 7:
+        
+      break;
     }
   }
   return 0;
@@ -410,3 +557,45 @@ void mostrarDetalles(HashMap *mapaJuegos, char* linea)
   printf("\n");
   return;
 }
+
+
+void * get_csv_field (char * tmp, int k) 
+{
+  int open_mark = 0;
+  char* ret=(char*) malloc (100*sizeof(char));
+  int ini_i=0, i=0;
+  int j=0;
+  while(tmp[i+1]!='\0')
+  {
+    if(tmp[i]== '\"')
+    {
+      open_mark = 1-open_mark;
+      if(open_mark) ini_i = i+1;
+      i++;
+      continue;
+    }
+    if(open_mark || tmp[i]!= ',')
+    {
+      if(k==j) ret[i-ini_i] = tmp[i];
+      i++;
+      continue;
+    }
+    if(tmp[i]== ',')
+    {
+      if(k==j)
+      {
+        ret[i-ini_i] = 0;
+        return ret;
+      }
+      j++; ini_i = i+1;
+    }
+    i++;
+  }
+  if(k==j) 
+  {
+    ret[i-ini_i] = 0;
+    return ret;
+  }
+  return NULL;
+}
+
